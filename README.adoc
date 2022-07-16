@@ -1,0 +1,9 @@
+= Asciidoc HTML 文档生成器
+
+> Dragon's Zone Team 专用的 HTML 文档生成器
+
+== 入门
+
+== LICENSE
+
+*注意：* AsciiDoc 归属于 link:https://www.eclipse.org/org/[Eclipse Foundation]，此项目使用 `asciidoctor` 命令渲染 `.adoc` 文件。

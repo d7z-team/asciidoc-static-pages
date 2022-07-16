@@ -1,0 +1,8 @@
+!.gitignore
+!.gitkeep
+!.gitmodules
+/.idea
+/.vscode
+*.tmp
+/build
+/example/build
