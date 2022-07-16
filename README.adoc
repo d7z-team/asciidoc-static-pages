@@ -4,6 +4,73 @@
 
 == 入门
 
+=== 编辑配置文件
+
+在文档根目录编辑文件 `.env` ，填入以下配置
+
+[source%linenums,bash]
+----
+# 项目主页
+HOME_URL="http://github.com/d7z-project/all-in-kubernetes"
+# 项目标题
+DOC_TITLE="All In Kubernetes"
+# 编译输出路径
+DOC_OUTPUT_PATH=/build
+# 菜单文档
+DOC_MENU=/zz-MENU.adoc
+# 主页文档
+DOC_MAIN=/MAIN.adoc
+# 源码路径地址
+DOC_SOURCE_URL='https://github.com/d7z-project/all-in-kubernetes/tree/{{COMMIT_ID}}/'
+# 图标
+DOC_ICON_FILE_PATH=/assets/icon/logo.svg
+
+----
+
+=== 创建 Github Action
+
+编辑文件 `.github/workflows/gh-pages.yml`，填入以下内容
+
+[source%linenums,yaml]
+----
+name: GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 0
+      - name: 编译项目
+        run: |
+          chmod +x ./.doc/doc.sh
+          sudo ./.doc/doc.sh toolchain
+          # 此处配置文档的根目录，如果在项目根目录则无需操作
+          ./.doc/doc.sh build `pwd`
+      - name: 发布 Web 页面
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+----
+
+最后提交即可。
+
 == LICENSE
 
 *注意：* AsciiDoc 归属于 link:https://www.eclipse.org/org/[Eclipse Foundation]，此项目使用 `asciidoctor` 命令渲染 `.adoc` 文件。
+
+如无其他说明，此项目使用 *MIT License* 发布。
