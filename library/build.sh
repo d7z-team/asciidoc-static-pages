@@ -144,11 +144,22 @@ asciidoc_build() {
         --attribute "docinfo=menu" \
         --attribute "docinfodir=$TEMPLATE_PATH" \
         -r asciidoctor-kroki --no-header-footer \
-        --out-file $MENU_HTML_OUT_PATH \
+        --out-file "$MENU_HTML_OUT_PATH" \
         "$SOURCE_ROOT_PATH/$MENU_PATH"
-    sed -i 's/.adoc">/.html">/g' "$MENU_HTML_OUT_PATH"
-    sed -i 's/<a href="/<a target="dist" href="/g' "$MENU_HTML_OUT_PATH"
+    # shellcheck disable=SC2002
+    sed -i \
+        -e 's/.adoc">/.html">/g' \
+        -e 's/<a href="/<a target="dist" href="/g' \
+        "$MENU_HTML_OUT_PATH"
+    echo "<html><head><style>" >"$MENU_HTML_OUT_PATH".new
+    # shellcheck disable=SC2129
+    cat "$TEMPLATE_PATH/menu.css" >>"$MENU_HTML_OUT_PATH".new
+    echo "</style></head><body>" >>"$MENU_HTML_OUT_PATH".new
+    cat "$MENU_HTML_OUT_PATH" >>"$MENU_HTML_OUT_PATH".new
+    echo "</body></html>" >>"$MENU_HTML_OUT_PATH".new
+    cat "$MENU_HTML_OUT_PATH".new > "$MENU_HTML_OUT_PATH"
     # BUILD HTML
+    # shellcheck disable=SC2038
     IFS='' read -r -a OUTPUT_FILES <<<"$(find "$OUTPUT_ROOT_PATH/" -name '*.html' | xargs echo)"
     # shellcheck disable=SC2206
     LIST_OUTPUT_FILES=(${OUTPUT_FILES[@]})
