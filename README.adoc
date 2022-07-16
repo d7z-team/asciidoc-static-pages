@@ -4,18 +4,6 @@
 
 == 入门
 
-=== 引入依赖
-
-[source%linenums,bash]
-----
-git submodule add https://github.com/d7z-team/asciidoc-static-pages .doc
-git submodule update
-git submodule update --init
-git submodule update --remote
-git add .doc
-git commit -m "doc:添加在线文档支持"
-----
-
 === 编辑配置文件
 
 在文档根目录编辑文件 `.env` ，填入以下配置
@@ -69,10 +57,7 @@ jobs:
           fetch-depth: 0
       - name: 编译项目
         run: |
-          chmod +x ./.doc/doc.sh
-          sudo ./.doc/doc.sh toolchain
-          # 此处配置文档的根目录，如果在项目根目录则无需操作
-          ./.doc/doc.sh build `pwd`
+
       - name: 发布 Web 页面
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.ref == 'refs/heads/main' }}
