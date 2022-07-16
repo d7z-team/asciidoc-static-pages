@@ -70,7 +70,7 @@ asciidoc_build() {
         git rev-parse --short HEAD || :
     )
     # shellcheck disable=SC2155
-    export DATE=$(date)
+    export DATE=$(date "+%Y-%m-%d %H:%M:%S")
 
     if [ -d "$OUTPUT_ROOT_PATH" ] && [ "$OUTPUT_ROOT_PATH" != "$SOURCE_ROOT_PATH" ]; then
         /bin/rm -rf "$OUTPUT_ROOT_PATH"
