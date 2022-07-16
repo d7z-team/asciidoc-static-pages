@@ -36,6 +36,8 @@ DOC_MAIN=/MAIN.adoc
 DOC_SOURCE_URL='https://github.com/d7z-project/all-in-kubernetes/tree/{{COMMIT_ID}}/'
 # 图标
 DOC_ICON_FILE_PATH=/assets/icon/logo.svg
+# 自定义 CSS 样式
+# DOC_THEME=dark.css
 
 ----
 
