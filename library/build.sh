@@ -51,6 +51,12 @@ asciidoc_build() {
     export MENU_PATH=$DOC_MENU
     # 项目主页位置
     export MAIN_PATH=$DOC_MAIN
+    # 主题
+    if [ "$DOC_THEME" ]; then
+        if [ -r "$SOURCE_ROOT_PATH/$DOC_THEME" ]; then
+            export THEME="$SOURCE_ROOT_PATH/$DOC_THEME"
+        fi
+    fi
     # 项目图标位置
     export ICON_PATH="$DOC_ICON_FILE_PATH"
     # TEMPLATE 目录位置
@@ -118,13 +124,20 @@ asciidoc_build() {
             cd "$SOURCE_ROOT_PATH"
             git log -1 --format=%h ".$SRC_RELATIVE_PATH"
         )
-        $ASCIIDOCTOR_COMMAND \
-            --attribute "nofooter" \
-            --attribute "toc=right" \
-            --attribute "docinfo=shared-footer" \
-            --attribute "docinfodir=$TEMPLATE_PATH" \
-            --safe-mode unsafe -r asciidoctor-kroki \
-            --out-file "$DIST_PATH" "$SRC_PATH"
+
+        COMMAND=(--attribute "nofooter"
+            --attribute "toc=right"
+            --attribute "docinfo=shared-footer"
+            --attribute "docinfodir=$TEMPLATE_PATH"
+            --safe-mode unsafe -r asciidoctor-kroki)
+        if [ "$THEME" ]; then
+            COMMAND+=(
+                --attribute "stylesheet=$(basename $THEME)"
+                # shellcheck disable=SC2086
+                --attribute "stylesdir=$(dirname $THEME)"
+            )
+        fi
+        $ASCIIDOCTOR_COMMAND ${COMMAND[*]} --out-file "$DIST_PATH" "$SRC_PATH"
         sed -i \
             -e 's/.adoc">/.html">/g' \
             -e 's@<a href="https://@<a target="_blank" href="https://@g' \
@@ -154,10 +167,14 @@ asciidoc_build() {
     echo "<html><head><style>" >"$MENU_HTML_OUT_PATH".new
     # shellcheck disable=SC2129
     cat "$TEMPLATE_PATH/menu.css" >>"$MENU_HTML_OUT_PATH".new
+    if [ "$THEME" ]; then
+        cat "$THEME" >>"$MENU_HTML_OUT_PATH".new
+    fi
+    # shellcheck disable=SC2129
     echo "</style></head><body>" >>"$MENU_HTML_OUT_PATH".new
     cat "$MENU_HTML_OUT_PATH" >>"$MENU_HTML_OUT_PATH".new
     echo "</body></html>" >>"$MENU_HTML_OUT_PATH".new
-    cat "$MENU_HTML_OUT_PATH".new > "$MENU_HTML_OUT_PATH"
+    cat "$MENU_HTML_OUT_PATH".new >"$MENU_HTML_OUT_PATH"
     # BUILD HTML
     # shellcheck disable=SC2038
     IFS='' read -r -a OUTPUT_FILES <<<"$(find "$OUTPUT_ROOT_PATH/" -name '*.html' | xargs echo)"
@@ -176,4 +193,8 @@ asciidoc_build() {
             -e "s@{{ICON_PATH}}@$ICON_PATH@g" \
             "$output_html"
     done
+    # 嵌入主题
+    if [ "$THEME" ]; then
+        sed -i "/<style>/r $THEME" "$OUTPUT_ROOT_PATH"/index.html
+    fi
 }
