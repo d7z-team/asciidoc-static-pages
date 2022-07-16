@@ -193,6 +193,8 @@ asciidoc_build() {
             -e "s@{{ICON_PATH}}@$ICON_PATH@g" \
             "$output_html"
     done
+    mkdir -p "$(dirname "$OUTPUT_ROOT_PATH"/"$ICON_PATH")" 2>/dev/null || :
+    cp "$SOURCE_ROOT_PATH"/"$ICON_PATH" "$OUTPUT_ROOT_PATH"/"$ICON_PATH" 2>/dev/null || :
     # 嵌入主题
     if [ "$THEME" ]; then
         sed -i "/<style>/r $THEME" "$OUTPUT_ROOT_PATH"/index.html
