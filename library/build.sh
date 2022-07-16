@@ -125,7 +125,11 @@ asciidoc_build() {
             --attribute "docinfodir=$TEMPLATE_PATH" \
             --safe-mode unsafe -r asciidoctor-kroki \
             --out-file "$DIST_PATH" "$SRC_PATH"
-        sed -i -e 's/.adoc">/.html">/g' "$DIST_PATH"
+        sed -i \
+            -e 's/.adoc">/.html">/g' \
+            -e 's@<a href="https://@<a target="_blank" href="https://@g' \
+            -e 's@<a href="http://@<a target="_blank" href="http://@g' \
+            "$DIST_PATH"
         sed -i \
             -e "s@{{FILE_NAME}}@$SRC_FILE_NAME@g" \
             -e "s@{{FILE_PATH}}@$SRC_RELATIVE_PATH@g" \
