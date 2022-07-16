@@ -166,10 +166,10 @@ asciidoc_build() {
         "$MENU_HTML_OUT_PATH"
     echo "<html><head><style>" >"$MENU_HTML_OUT_PATH".new
     # shellcheck disable=SC2129
-    cat "$TEMPLATE_PATH/menu.css" >>"$MENU_HTML_OUT_PATH".new
     if [ "$THEME" ]; then
         cat "$THEME" >>"$MENU_HTML_OUT_PATH".new
     fi
+    cat "$TEMPLATE_PATH/menu.css" >>"$MENU_HTML_OUT_PATH".new
     # shellcheck disable=SC2129
     echo "</style></head><body>" >>"$MENU_HTML_OUT_PATH".new
     cat "$MENU_HTML_OUT_PATH" >>"$MENU_HTML_OUT_PATH".new
