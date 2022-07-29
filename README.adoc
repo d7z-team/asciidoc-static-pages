@@ -26,7 +26,8 @@ DOC_SOURCE_URL='https://github.com/d7z-project/all-in-kubernetes/tree/{{COMMIT_I
 DOC_ICON_FILE_PATH=/assets/icon/logo.svg
 # 自定义 CSS 样式
 # DOC_THEME=dark.css
-
+# 自定义 asciidoc 渲染模板
+# DOC_ATTR_FILE_PATH=/attr.properties
 ----
 
 === 创建 Github Action
