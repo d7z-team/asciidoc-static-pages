@@ -57,6 +57,13 @@ asciidoc_build() {
             export THEME="$SOURCE_ROOT_PATH/$DOC_THEME"
         fi
     fi
+    if [ "$DOC_ATTR_FILE_PATH" ]; then
+        if [ -r "$SOURCE_ROOT_PATH/$DOC_ATTR_FILE_PATH" ]; then
+            # shellcheck disable=SC2046
+            # shellcheck disable=SC2002
+           ATTR_COMMAND=$(cat "$SOURCE_ROOT_PATH"/"$DOC_ATTR_FILE_PATH" | grep -v "^#" | grep = | sed -e "s/^/--attribute '/g" -e "s/$/\'/g")
+        fi
+    fi
     # 项目图标位置
     export ICON_PATH="$DOC_ICON_FILE_PATH"
     # TEMPLATE 目录位置
@@ -137,7 +144,7 @@ asciidoc_build() {
                 --attribute "stylesdir=$(dirname $THEME)"
             )
         fi
-        $ASCIIDOCTOR_COMMAND ${COMMAND[*]} --out-file "$DIST_PATH" "$SRC_PATH"
+        echo $ASCIIDOCTOR_COMMAND ${COMMAND[*]} $ATTR_COMMAND --out-file "$DIST_PATH" "$SRC_PATH" | bash -
         sed -i \
             -e 's/.adoc">/.html">/g' \
             -e 's@<a href="https://@<a target="_blank" href="https://@g' \
@@ -153,12 +160,13 @@ asciidoc_build() {
     done
     # BUILD_MENU
     MENU_HTML_OUT_PATH="$OUTPUT_ROOT_PATH/${MENU_PATH//.adoc/.html}"
-    asciidoctor --safe-mode unsafe \
+    echo asciidoctor --safe-mode unsafe \
         --attribute "docinfo=menu" \
         --attribute "docinfodir=$TEMPLATE_PATH" \
+        $ATTR_COMMAND \
         -r asciidoctor-kroki --no-header-footer \
         --out-file "$MENU_HTML_OUT_PATH" \
-        "$SOURCE_ROOT_PATH/$MENU_PATH"
+        "$SOURCE_ROOT_PATH/$MENU_PATH" | bash
     # shellcheck disable=SC2002
     sed -i \
         -e 's/.adoc">/.html">/g' \
