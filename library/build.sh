@@ -61,7 +61,8 @@ asciidoc_build() {
         if [ -r "$SOURCE_ROOT_PATH/$DOC_ATTR_FILE_PATH" ]; then
             # shellcheck disable=SC2046
             # shellcheck disable=SC2002
-           ATTR_COMMAND=$(cat "$SOURCE_ROOT_PATH"/"$DOC_ATTR_FILE_PATH" | grep -v "^#" | grep = | sed -e "s/^/--attribute '/g" -e "s/$/\'/g")
+            ATTR_COMMAND=$(cat "$SOURCE_ROOT_PATH"/"$DOC_ATTR_FILE_PATH" | grep -v "^#" | grep = | sed -e "s/^/--attribute '/g" -e "s/$/\'/g")
+            SED_COMMAND=$(cat "$SOURCE_ROOT_PATH"/"$DOC_ATTR_FILE_PATH" | grep -v "^#" | grep = | sed -e 's/=/}}|/g' -e "s@^@-e 's|{{@g" -e "s@\$@|g'@g")
         fi
     fi
     # 项目图标位置
@@ -145,6 +146,7 @@ asciidoc_build() {
             )
         fi
         echo $ASCIIDOCTOR_COMMAND ${COMMAND[*]} $ATTR_COMMAND --out-file "$DIST_PATH" "$SRC_PATH" | bash -
+        echo sed -i $SED_COMMAND "$DIST_PATH" | bash
         sed -i \
             -e 's/.adoc">/.html">/g' \
             -e 's@<a href="https://@<a target="_blank" href="https://@g' \
@@ -167,6 +169,8 @@ asciidoc_build() {
         -r asciidoctor-kroki --no-header-footer \
         --out-file "$MENU_HTML_OUT_PATH" \
         "$SOURCE_ROOT_PATH/$MENU_PATH" | bash
+    echo sed -i $SED_COMMAND "$MENU_HTML_OUT_PATH" | bash
+
     # shellcheck disable=SC2002
     sed -i \
         -e 's/.adoc">/.html">/g' \
