@@ -1,0 +1,16 @@
+pages:
+  info: # 网页信息
+    title: "All In Kubernetes" # 项目标题
+    home: 'https://github.com/d7z-project/all-in-kubernetes' # 项目主页
+  location: # 配置路径
+    root: '' # 文档相对目录
+    menu: '/MENU.adoc' # 菜单文档
+    main: '/MAIN.adoc' # 主页文档
+    icon: '/assets/icon/logo.svg' # 图标
+    style: '/dark.css' # 自定义 CSS
+    script: '/user.js' # 自定义 JS
+  conf: # 功能配置
+    source-url: 'https://github.com/d7z-project/all-in-kubernetes/tree/{{COMMIT_ID}}/' #源码路径拼接
+  attr: # 文档变量
+    - key: 'value'
+  attrRef: attr.properties # 文档变量文件链接

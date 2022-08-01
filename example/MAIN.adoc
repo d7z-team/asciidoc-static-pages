@@ -1,7 +1,0 @@
-= Hello World
-
-. {{FILE_NAME}}
-. {{FILE_DATE}}
-. {{FILE_PATH}}
-. {{FILE_COMMIT_ID}}
-. {{FILE_COMMIT_SHORT_ID}}
