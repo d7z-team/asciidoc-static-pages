@@ -22,7 +22,18 @@ __pacman_install() {
     fi
 
 }
-
+__apk_install() {
+    . /etc/os-release || :
+    INSTALL_PKG=(asciidoctor git rsync)
+    for package in ${INSTALL_PKG[*]}; do
+        if [ "$(apk info "$package" 2>/dev/null)" ]; then
+            _root_echo "软件包 $package 不存在，将使用 apk 安装"
+            apk add "$package"
+        else
+            _root_echo "软件包 $package 已存在，跳过安装"
+        fi
+    done
+}
 __apt_install() {
     . /etc/os-release || :
     if [ "$ID" == 'debian' ] || [ "$ID" == 'ubuntu' ]; then
@@ -65,6 +76,8 @@ _root_toolchain_installer() {
         __pacman_install
     elif [ -n "$(type apt-get 2>/dev/null)" ]; then
         __apt_install
+    elif [ -n "$(type apk 2>/dev/null)" ]; then
+        __apk_install
     fi
     __check_toolchain
     __asciidoctor_extra_install
