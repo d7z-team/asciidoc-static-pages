@@ -1,48 +1,46 @@
-extern crate yaml_rust;
+mod libs;
+
 extern crate core;
 
+use std::fs;
+use std::ops::Add;
 use clap::Parser;
 
 
 use std::path::Path;
+use crate::libs::config::{ConfigRoot};
 
-///  AsciiDoc 文档渲染工具包
+///  AsciiDoc Document Builder
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
-    /// Set build Config Path
-    #[clap(short, long, value_parser = check_path, default_value_t = String::from(".pages.yaml"))]
-    pub config: String,
-    /// Add Document variable
+    /// build Config Path.
+    #[clap(short, long = "--config", value_parser = check_path, default_value_t = String::from(".pages.yaml"))]
+    pub config_file_path: String,
+    /// Add Document variable.
     #[clap(short, long, value_parser)]
     pub variable: Vec<String>,
-    /// Build Path
-    #[clap(short, long, value_parser,default_value_t = String::from("build"))]
-    pub build: String,
+    /// Web Output Directory.
+    #[clap(short = 'O', long = "--output", value_parser, default_value_t = String::from("build"))]
+    pub build_dir: String,
 }
 
 fn main() {
     let args: Args = Args::parse();
-    println!("{}", args.config);
-    // let current_path = fs::canonicalize("./").unwrap().to_str().unwrap().to_string();
-    // let mut conf_path = "".to_string();
-    // conf_path.push_str(&current_path);
-    // let args1: Vec<String> = env::args().collect();
-    // if args1.len() < 2 {
-    //     conf_path.push_str("/.pages.yaml");
-    // } else {
-    //     conf_path.push_str(args1.get(1).unwrap());
-    //     conf_path.push_str("/.pages.yaml");
-    // }
-    // println!("{}", conf_path);
-    // // let mut vec: Vec<OsString> = Vec::new();
-    // // let dir = fs::read_dir("./").unwrap();
-    // // for data in dir {
-    // //     let data = data.unwrap();
-    // //     let _display = data.path().display().to_string();
-    // //     let result = fs::canonicalize(data.path()).unwrap();
-    // //     println!("{:?}", result)
-    // // }
+    let path1 = std::path::Path::new(&args.config_file_path).to_path_buf();
+    let x2 = path1.parent().unwrap();
+    println!("{}", x2.to_str().unwrap());
+    let conf_data = fs::read_to_string(args.config_file_path).unwrap();
+    let mut values: ConfigRoot = serde_yaml::from_str(&conf_data).expect("malformed yaml!");
+    // pull command attrs.
+    for attrs in args.variable {
+        values.pages.attr.push(attrs)
+    }
+    let x1: String = String::from("./").add(&values.pages.location.root);
+    for x in fs::read_dir(&x1).unwrap() {
+        println!("{:?}", x.unwrap().path().to_str())
+    }
+    // println!("{:?}", values)
 }
 
 fn check_path(path: &str) -> Result<String, String> {

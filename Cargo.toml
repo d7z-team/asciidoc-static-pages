@@ -2,10 +2,11 @@
 name = "asciidoc-static-pages"
 version = "0.1.0"
 edition = "2021"
-description = "AsciiDoc 文档渲染工具"
+description = "AsciiDoc Document Builder"
 license = "MIT"
 
 [dependencies]
-yaml-rust = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.9"
 clap = { version = "3.2.16", features = ["derive"] }
 git2 = "0.15"
