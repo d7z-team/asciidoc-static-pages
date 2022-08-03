@@ -3,14 +3,24 @@ pages:
     title: "AsciiDoc Builder" # 项目标题
     home: 'https://github.com/d7z-team/asciidoc-static-pages' # 项目主页
   location: # 配置路径
-    root: '/docs' # 文档相对目录
-    menu: '/MENU.adoc' # 菜单文档
-    main: '/MAIN.adoc' # 主页文档
-    icon: '/assets/icon/logo.svg' # 图标
-    style: '/dark.css' # 自定义 CSS
-    script: '/user.js' # 自定义 JS
+    root: '/docs' # 文档根目录（相对于此文件所在的目录）
+    menu: '/MENU.adoc' # 菜单文档（相对于文档根目录）
+    main: '/MAIN.adoc' # 主页文档（相对于文档根目录）
+    icon: '/assets/icon/logo.svg' # 图标（相对于文档根目录）
+    style: '/dark.css' # 自定义 CSS（相对于文档根目录）
+    script: '/user.js' # 自定义 JS（相对于文档根目录）
+    output: '/public' # 编译输出目录 （相对于此文件所在的目录）
   conf: # 功能配置
     source_url: 'https://github.com/d7z-team/asciidoc-static-pages/tree/{{COMMIT_ID}}/' #源码路径拼接
-  attr: # 文档变量
+    attr_ext: # 变量注入的文件后缀
+      - adoc
+      - sh
+      - txt
+      - yaml
+      - yml
+    doc_ext: # 识别为 asciidoc 文档的后缀
+      - adoc
+      - asciidoc
+  attr: # 文档变量，注意，此内容同时会加载至 asciidoctor 的 attr 配置中
     - key=value
-  attr_ref: attr.properties # 文档变量文件链接
+  attr_ref: /docs/attr.properties # 变量外部文件链接,仅支持单行 key=value 的形式！
