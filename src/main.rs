@@ -72,9 +72,6 @@ fn main() {
                 .arg("-r").arg("asciidoctor-kroki")
                 .arg("--out-file").arg(&dist_html_path).arg(dist_src_path);
             let _output = execute_command.output().expect(&format!("command {:?}  execute fail!", execute_command));
-            if _output.status.code().unwrap() != 0 {
-                panic!("build fail! command: {:?}", execute_command)
-            }
             let mut dist_html_data = fs::read_to_string(&dist_html_path).unwrap();
             string::replace_range(&mut dist_html_data, "{{global.source.url}}", &config.source_url);
             string::replace_range(&mut dist_html_data, "{{global.title}}", &config.info.title);

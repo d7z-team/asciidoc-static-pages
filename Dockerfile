@@ -1,4 +1,4 @@
-FROM rust:1.62.1-slim-bullseye as builder
+FROM rust:1.62.0-slim-bullseye as builder
 WORKDIR /usr/src/asciidoc-static-pages
 #RUN sed -i -e 's/deb.debian.org/mirrors.ustc.edu.cn/g' -e 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
 #    mkdir -p "/root/.cargo" && echo "[source.crates-io]" > /root/.cargo/config.toml   && \
