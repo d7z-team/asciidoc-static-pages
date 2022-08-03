@@ -1,0 +1,6 @@
+FROM debian:bullseye-slim
+RUN sed -i -e 's/deb.debian.org/mirrors.ustc.edu.cn/g' -e 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
+RUN apt-get update && apt-get install -y asciidoctor git && rm -rf /var/lib/apt/lists/* && gem install rouge asciidoctor-kroki
+RUN git clone https://hub.fastgit.xyz/d7z-project/all-in-kubernetes.git
+COPY target/x86_64-unknown-linux-musl/release/asciidoc-static-pages /usr/local/bin/asciidoc-static-pages
+COPY target/x86_64-unknown-linux-musl/release/asciidoc-static-pages /usr/local/bin/pages

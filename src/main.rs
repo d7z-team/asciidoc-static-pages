@@ -72,7 +72,7 @@ fn main() {
                 .arg("-r").arg("asciidoctor-kroki")
                 .arg("--out-file").arg(&dist_html_path).arg(dist_src_path);
             let _output = execute_command.output().expect(&format!("command {:?}  execute fail!", execute_command));
-            let mut dist_html_data = fs::read_to_string(&dist_html_path).unwrap();
+            let mut dist_html_data = fs::read_to_string(&dist_html_path).expect(&format!("error path: {}.",&dist_html_path));
             string::replace_range(&mut dist_html_data, "{{global.source.url}}", &config.source_url);
             string::replace_range(&mut dist_html_data, "{{global.title}}", &config.info.title);
             string::replace_range(&mut dist_html_data, "{{global.home}}", &config.info.home);
