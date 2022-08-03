@@ -11,7 +11,7 @@ pages:
     script: '/user.js' # 自定义 JS（相对于文档根目录）
     output: '/public' # 编译输出目录 （相对于此文件所在的目录）
   conf: # 功能配置
-    source_url: 'https://github.com/d7z-team/asciidoc-static-pages/tree/{{COMMIT_ID}}/' #源码路径拼接
+    source_url: 'https://github.com/d7z-team/asciidoc-static-pages/tree/{{file.commit.id}}/' #源码路径拼接
     attr_ext: # 变量注入的文件后缀
       - adoc
       - sh

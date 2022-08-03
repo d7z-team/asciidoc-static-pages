@@ -1,9 +1,10 @@
 use std::collections::{HashMap, HashSet};
 use std::fs;
-use std::ops::Add;
+use std::ops::Not;
 use std::path::Path;
 use clap::Parser;
 use crate::libs::file;
+use crate::libs::prop::{PageInfo, PageLocation};
 use crate::PropRoot;
 
 
@@ -16,6 +17,9 @@ pub struct Config {
     pub attrs: HashMap<String, String>,
     pub doc_ext: HashSet<String>,
     pub attr_ext: HashSet<String>,
+    pub location: PageLocation,
+    pub info: PageInfo,
+    pub source_url: String,
 }
 
 impl Config {
@@ -42,7 +46,7 @@ impl Config {
         if Path::new(&attr_file_path).is_file() {
             fs::read_to_string(attr_file_path).unwrap().lines()
                 .map(|e| -> Vec<&str> { e.splitn(2, "=").collect() })
-                .filter(|e| e.len() == 2)
+                .filter(|e| e.len() == 2 && e.get(0).unwrap().trim().starts_with("#").not())
                 .for_each(|e| {
                     attrs.insert(e[0].to_string(), e[1].to_string());
                 });
@@ -58,6 +62,9 @@ impl Config {
             attrs,
             doc_ext: conf.doc_ext.iter().map(|e| e.to_string()).collect(),
             attr_ext: conf.attr_ext.iter().map(|e| e.to_string()).collect(),
+            location: config_root.pages.location.clone(),
+            info: config_root.pages.info.clone(),
+            source_url: config_root.pages.conf.source_url,
         })
     }
 }

@@ -24,7 +24,7 @@ fn default_attr() -> Vec<String> {
     vec![]
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct PageInfo {
     pub title: String,
     pub home: String,
@@ -50,7 +50,7 @@ fn default_doc_ext() -> Vec<String> {
     DOC_EXT.iter().map(|e| e.to_string()).collect()
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct PageLocation {
     #[serde(default = "empty_str")]
     pub root: String,

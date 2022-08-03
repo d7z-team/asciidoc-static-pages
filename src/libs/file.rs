@@ -1,20 +1,28 @@
 use std::fs;
+use std::fs::File;
+use std::io::Write;
 use std::ops::Not;
 
 use std::path::Path;
 use std::time::{SystemTime};
+use chrono::{DateTime, Utc};
 
 pub fn new_path(parent: &str, name: &str) -> String {
-    Path::new(parent).join(name).to_str().unwrap().to_string()
+    let data = if name.starts_with("/") || name.starts_with("\\") {
+        name.split_at(1).1
+    } else {
+        name
+    };
+    Path::new(parent).join(data).to_str().unwrap().to_string()
 }
 
 /// 递归获取某个目录下的所有文件
-pub fn list_pub_files(path_str: &str, container: &mut Vec<String>, skip: &Vec<String>) {
+pub fn list_pub_files(path_str: &str, container: &mut Vec<String>, skip: &Vec<&String>) {
     list_files(path_str, container, skip, true)
 }
 
 /// 递归获取某个目录下的所有文件
-pub fn list_files(path_str: &str, container: &mut Vec<String>, skip: &Vec<String>, skip_hide: bool) {
+pub fn list_files(path_str: &str, container: &mut Vec<String>, skip: &Vec<&String>, skip_hide: bool) {
     let dir_path = Path::new(path_str);
     if dir_path.is_file() {
         container.push(path_str.to_string());
@@ -22,7 +30,7 @@ pub fn list_files(path_str: &str, container: &mut Vec<String>, skip: &Vec<String
     }
     let dir_name = dir_path.file_name().unwrap().to_str().unwrap();
     for skip_path in skip {
-        if path_str.starts_with(skip_path) || (dir_name.starts_with(".") && skip_hide) {
+        if path_str.starts_with(*skip_path) || (dir_name.starts_with(".") && skip_hide) {
             return;
         }
     }
@@ -38,13 +46,54 @@ pub fn list_files(path_str: &str, container: &mut Vec<String>, skip: &Vec<String
     }
 }
 
+pub fn delete_dir(src: &str) {
+    for x in fs::read_dir(src).unwrap() {
+        let entry = x.unwrap().path();
+        let path = entry.to_str().unwrap();
+        if entry.is_dir() {
+            delete_dir(path);
+            fs::remove_dir(path).unwrap();
+        } else {
+            fs::remove_file(path).unwrap();
+        }
+    }
+}
+
+pub fn replace_file_ext(src: &str, new_ext: &str) -> String {
+    let ext_index = src.rfind(".").unwrap();
+    let mut new_name = src.to_string();
+    new_name.replace_range(ext_index + 1..src.len(), new_ext);
+    return new_name;
+}
+
+pub fn auto_copy_file(src: &str, dist: &str) {
+    let dist_path = Path::new(dist);
+    let parent_path = dist_path.parent().unwrap();
+    if parent_path.exists().not() {
+        fs::create_dir_all(parent_path).expect(&format!("directory {} create fail!", parent_path.to_str().unwrap()));
+    }
+    fs::copy(src, dist_path).unwrap();
+}
+
+pub fn auto_write_file(path: &str, data: &str) {
+    let dist_path = Path::new(path);
+    if dist_path.is_file() {
+        fs::remove_file(path).unwrap();
+    }
+    let parent_path = dist_path.parent().unwrap();
+    if parent_path.exists().not() {
+        fs::create_dir_all(parent_path).expect(&format!("directory {} create fail!", parent_path.to_str().unwrap()));
+    }
+    File::create(dist_path).unwrap().write(data.as_bytes()).expect("write fail!");
+}
+
 #[derive(Debug)]
 pub struct FileInfo {
     pub name: String,
     pub path: String,
     pub ext: String,
-    pub create_time: SystemTime,
-    pub update_time: SystemTime,
+    pub create_time: DateTime<Utc>,
+    pub update_time: DateTime<Utc>,
 }
 
 impl FileInfo {
@@ -57,8 +106,8 @@ impl FileInfo {
             path: path_str.to_string(),
             ext: option,
             name: file_name,
-            create_time: metadata.created().unwrap_or(SystemTime::now()),
-            update_time: metadata.accessed().unwrap_or(SystemTime::now()),
+            create_time: metadata.created().unwrap_or(SystemTime::now()).into(),
+            update_time: metadata.accessed().unwrap_or(SystemTime::now()).into(),
         }
     }
 }
