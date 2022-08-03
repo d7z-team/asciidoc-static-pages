@@ -12,5 +12,6 @@ RUN cargo build --release && cargo install --path .
 
 FROM debian:bullseye-slim
 #RUN sed -i -e 's/deb.debian.org/mirrors.ustc.edu.cn/g' -e 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
-RUN apt-get update && apt-get install -y asciidoctor git && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y asciidoctor git && rm -rf /var/lib/apt/lists/* && gem install rouge asciidoctor-kroki
 COPY --from=builder /usr/local/cargo/bin/asciidoc-static-pages /usr/local/bin/asciidoc-static-pages
+COPY --from=builder /usr/local/cargo/bin/asciidoc-static-pages /usr/local/bin/pages
