@@ -6,7 +6,7 @@ WORKDIR /usr/src/asciidoc-static-pages
 #            echo "[source.ustc]" >> /root/.cargo/config.toml &&  \
 #            echo 'registry = "git://mirrors.ustc.edu.cn/crates.io-index"' >> /root/.cargo/config.toml && \
 #            cp  /root/.cargo/config.toml /root/.cargo/config
-RUN apt-get update && apt-get install -y libssl-dev git curl wget && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libssl-dev git curl pkg-config wget && rm -rf /var/lib/apt/lists/*
 COPY . .
 RUN cargo build --release && cargo install --path .
 
