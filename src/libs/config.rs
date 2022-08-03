@@ -82,9 +82,6 @@ struct Args {
     /// Web Output Directory.
     #[clap(short = 'O', long = "--output", value_parser, default_value_t = String::from("build"))]
     pub build_dir: String,
-    /// try build
-    #[clap(short = 't', long = "--try", value_parser, default_value_t = false)]
-    pub try_build: bool,
 }
 
 fn check_path(path: &str) -> Result<String> {

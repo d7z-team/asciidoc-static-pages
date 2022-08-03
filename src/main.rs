@@ -1,18 +1,21 @@
 mod libs;
 mod res;
 
+
 use std::fs;
 use std::ops::Add;
-use std::path::Path;
+use std::path::{Path};
 use std::process::Command;
+use chrono::{Local, TimeZone};
 use crate::file::FileInfo;
 use crate::libs::config::Config;
-use crate::libs::{file, string};
+use crate::libs::{file, git, string};
 use crate::libs::prop::{PropRoot};
 
 
 fn main() {
     let config = Config::load().unwrap();
+    let git_file_info = git::get_all_file_commit_info(&config.project_path);
     let mut files: Vec<String> = vec![];
     let skip = &vec![&config.output_path];
     file::list_pub_files(&config.document_path, &mut files, skip);
@@ -21,8 +24,19 @@ fn main() {
     let replace_attr: Vec<(String, String)> = config.attrs.iter()
         .map(|e| (String::from("{{item}}").replace("item", e.0), e.1.to_string())).collect();
     let command_attr: Vec<String> = config.attrs.iter().map(|e| format!("{}={}", e.0, e.1)).collect();
-    let data: Vec<FileInfo> = files.iter().map(|e| FileInfo::get_info(e)).collect();
-    for src_info in &data {
+    let file_info: Vec<FileInfo> = files.iter()
+        .map(|e| {
+            let mut info = FileInfo::get_info(e);
+            if let Some(git_info) = git_file_info.get(&info.path) {
+                info.update_time = Local.timestamp_millis(git_info.last_update_time);
+                info.create_time = Local.timestamp_millis(git_info.last_update_time);
+                info.commit_id = git_info.last_update_commit_id.to_owned();
+                info.commit_short_id = git_info.last_update_commit_short_id.to_owned();
+            }
+            info
+        })
+        .collect();
+    for src_info in &file_info {
         let dist_path = file::new_path(&(config.output_path),
                                        &src_info.path.replace(&(config.document_path), ""));
         if config.attr_ext.contains(&src_info.ext) {
@@ -38,7 +52,7 @@ fn main() {
     //写入 body 模板
     file::auto_write_file(&file::new_path(&config.output_path, "docinfo-footer.html"), res::res::BODY_TEMPLATE);
     // 渲染内容
-    for src_info in &data {
+    for src_info in &file_info {
         if config.doc_ext.contains(&src_info.ext) {
             let relative_dist_src_path = src_info.path.replace(&(config.document_path), "");
             let dist_src_path = file::new_path(&(config.output_path),
@@ -66,12 +80,12 @@ fn main() {
             string::replace_range(&mut dist_html_data, "{{global.title}}", &config.info.title);
             string::replace_range(&mut dist_html_data, "{{global.home}}", &config.info.home);
             string::replace_range(&mut dist_html_data, r#".adoc">"#, r#".html">"#);
-            string::replace_range(&mut dist_html_data, r#"<a href="https://">"#, r#"<a target="_blank" href="https://"#);
-            string::replace_range(&mut dist_html_data, r#"<a href="http://">"#, r#"<a target="_blank" href="http://"#);
+            string::replace_range(&mut dist_html_data, r#"<a href="https://"#, r#"<a target="_blank" href="https://"#);
+            string::replace_range(&mut dist_html_data, r#"<a href="http://"#, r#"<a target="_blank" href="http://"#);
             string::replace_range(&mut dist_html_data, "{{file.path}}", &relative_dist_src_path);
             string::replace_range(&mut dist_html_data, "{{file.name}}", &src_info.name);
-            string::replace_range(&mut dist_html_data, "{{file.commit.id}}", &src_info.name);
-            string::replace_range(&mut dist_html_data, "{{file.commit.short-id}}", &src_info.name);
+            string::replace_range(&mut dist_html_data, "{{file.commit.id}}", &src_info.commit_id);
+            string::replace_range(&mut dist_html_data, "{{file.commit.short-id}}", &src_info.commit_short_id);
             string::replace_range(&mut dist_html_data, "{{file.commit.last-date}}",
                                   &src_info.update_time.format("%Y-%m-%d %H:%M:%S").to_string());
             file::auto_write_file(&dist_html_path, &dist_html_data);
@@ -134,8 +148,10 @@ fn main() {
                               &file::replace_file_ext(&config.location.main, "html"));
         string::replace_range(&mut dist_html_path_data, "{{global.commit.id}}", "none");
         string::replace_range(&mut dist_html_path_data, "{{global.icon.path}}", icon_name_str);
-        string::replace_range(&mut dist_html_path_data, "{{global.commit.short-id}}", "none");
-        string::replace_range(&mut dist_html_path_data, "{{global.commit.last-date}}", "none");
+        let main_git_info = git_file_info.get(&file::new_path(&config.project_path, &config.location.main)).unwrap();
+        string::replace_range(&mut dist_html_path_data, "{{global.commit.short-id}}",
+                              &main_git_info.last_update_commit_short_id);
+        string::replace_range(&mut dist_html_path_data, "{{global.commit.last-date}}", &main_git_info.last_update_commit_id);
         string::replace_range(&mut dist_html_path_data, "</body>", &end_data);
         file::auto_write_file(&dist_html_path, &dist_html_path_data);
     }

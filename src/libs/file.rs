@@ -5,7 +5,7 @@ use std::ops::Not;
 
 use std::path::Path;
 use std::time::{SystemTime};
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local};
 
 pub fn new_path(parent: &str, name: &str) -> String {
     let data = if name.starts_with("/") || name.starts_with("\\") {
@@ -47,14 +47,17 @@ pub fn list_files(path_str: &str, container: &mut Vec<String>, skip: &Vec<&Strin
 }
 
 pub fn delete_dir(src: &str) {
-    for x in fs::read_dir(src).unwrap() {
-        let entry = x.unwrap().path();
-        let path = entry.to_str().unwrap();
-        if entry.is_dir() {
-            delete_dir(path);
-            fs::remove_dir(path).unwrap();
-        } else {
-            fs::remove_file(path).unwrap();
+    let result = fs::read_dir(src);
+    if let Ok(result) = result {
+        for x in result {
+            let entry = x.unwrap().path();
+            let path = entry.to_str().unwrap();
+            if entry.is_dir() {
+                delete_dir(path);
+                fs::remove_dir(path).unwrap();
+            } else {
+                fs::remove_file(path).unwrap();
+            }
         }
     }
 }
@@ -92,8 +95,10 @@ pub struct FileInfo {
     pub name: String,
     pub path: String,
     pub ext: String,
-    pub create_time: DateTime<Utc>,
-    pub update_time: DateTime<Utc>,
+    pub create_time: DateTime<Local>,
+    pub update_time: DateTime<Local>,
+    pub commit_id: String,
+    pub commit_short_id: String,
 }
 
 impl FileInfo {
@@ -108,6 +113,8 @@ impl FileInfo {
             name: file_name,
             create_time: metadata.created().unwrap_or(SystemTime::now()).into(),
             update_time: metadata.accessed().unwrap_or(SystemTime::now()).into(),
+            commit_id: String::new(),
+            commit_short_id: String::new(),
         }
     }
 }
