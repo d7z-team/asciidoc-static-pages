@@ -2,7 +2,7 @@
 FROM rust:1.62.0-slim-bullseye as builder
 WORKDIR /usr/src/asciidoc-static-pages
 COPY . .
-RUN apt-get update && apt-get install -y libssl-dev git curl pkg-config wget && rm -rf /var/lib/apt/lists/* && cargo add x86_64-unknown-linux-musl
+RUN apt-get update && apt-get install -y libssl-dev git curl pkg-config wget && rm -rf /var/lib/apt/lists/* &&  rustup target add x86_64-unknown-linux-musl
 RUN cargo build --release --target x86_64-unknown-linux-musl && install -m 0755 target/x86_64-unknown-linux-musl/release/asciidoc-static-pages /usr/local/bin/asciidoc-static-pages
 
 
