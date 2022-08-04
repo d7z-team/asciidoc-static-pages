@@ -71,10 +71,8 @@ fn main() {
                 .arg("--safe-mode").arg("unsafe")
                 .arg("-r").arg("asciidoctor-kroki")
                 .arg("--out-file").arg(&dist_html_path).arg(dist_src_path);
-            println!("execute command:{:?}", execute_command);
-            let child = execute_command.output().expect(&format!("command {:?}  execute fail ! ", execute_command));
-            println!("{}", String::from_utf8_lossy(&child.stdout));
-            eprintln!("{}", String::from_utf8_lossy(&child.stderr));
+            let _child = execute_command.output().expect(&format!("command {:?}  execute fail ! ", &execute_command));
+            _child.status.code().expect(&format!("command error exit. command: {:?}", &execute_command));
             let mut dist_html_data = fs::read_to_string(&dist_html_path).expect(&format!("error path: {}.", &dist_html_path));
             string::replace_range(&mut dist_html_data, "{{global.source.url}}", &config.source_url);
             string::replace_range(&mut dist_html_data, "{{global.title}}", &config.info.title);
