@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.3-labs
 FROM archlinux as builder
-RUN pacman -Syu rustup base-devel git musl curl wget --noconfirm && rustup target add x86_64-unknown-linux-musl
+RUN pacman -Syu rustup base-devel git musl curl wget --noconfirm && rustup default stable && rustup target add x86_64-unknown-linux-musl
 WORKDIR /usr/src/asciidoc-static-pages
 COPY . .
 RUN RUST_BACKTRACE=1 cargo build --release --target x86_64-unknown-linux-musl && \
