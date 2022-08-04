@@ -71,8 +71,11 @@ fn main() {
                 .arg("--safe-mode").arg("unsafe")
                 .arg("-r").arg("asciidoctor-kroki")
                 .arg("--out-file").arg(&dist_html_path).arg(dist_src_path);
-            let _output = execute_command.output().expect(&format!("command {:?}  execute fail!", execute_command));
-            let mut dist_html_data = fs::read_to_string(&dist_html_path).expect(&format!("error path: {}.",&dist_html_path));
+            println!("execute command:{:?}", execute_command);
+            let child = execute_command.output().expect(&format!("command {:?}  execute fail ! ", execute_command));
+            println!("{}", String::from_utf8_lossy(&child.stdout));
+            eprintln!("{}", String::from_utf8_lossy(&child.stderr));
+            let mut dist_html_data = fs::read_to_string(&dist_html_path).expect(&format!("error path: {}.", &dist_html_path));
             string::replace_range(&mut dist_html_data, "{{global.source.url}}", &config.source_url);
             string::replace_range(&mut dist_html_data, "{{global.title}}", &config.info.title);
             string::replace_range(&mut dist_html_data, "{{global.home}}", &config.info.home);
@@ -88,7 +91,7 @@ fn main() {
             file::auto_write_file(&dist_html_path, &dist_html_data);
         }
     }
-    // 编译目录
+// 编译目录
     let menu_path = file::new_path(&config.output_path, &config.location.menu);
     let mut menu_command = Command::new("asciidoctor");
     for command in &command_attr {
@@ -108,7 +111,7 @@ fn main() {
     string::replace_range(&mut menu_data, r#".adoc">"#, r#".html">"#);
     string::replace_range(&mut menu_data, r#"<a href=""#, r#"<a target="_right_panel" href=""#);
     file::auto_write_file(&menu_html_path, &menu_data);
-    // 写入静态资源
+// 写入静态资源
     file::auto_write_file(&file::new_path(&config.output_path, "index.html"), res::res::PAGE_INDEX);
     let mut html_file: Vec<String> = Vec::new();
     file::list_pub_files(&config.output_path, &mut html_file, &Vec::new());
@@ -119,7 +122,7 @@ fn main() {
     file::auto_copy_file(
         old_icon_path,
         &file::new_path(&config.output_path, icon_name_str));
-    // 注入默认的 css
+// 注入默认的 css
     let mut end_data = r#"<style>{{style}}</style> <script>{{script}}</script>"#.to_string();
     let user_style_path_str = file::new_path(&config.project_path, &config.location.style);
     let user_script_path_str = file::new_path(&config.project_path, &config.location.script);
@@ -135,7 +138,7 @@ fn main() {
     }
     string::replace_range(&mut end_data, "{{style}}", &output_style);
     string::replace_range(&mut end_data, "{{script}}", &output_script);
-    // 写入其他变量
+// 写入其他变量
     for dist_html_path in html_file {
         let mut dist_html_path_data = fs::read_to_string(&dist_html_path).unwrap();
         string::replace_range(&mut dist_html_path_data, "{{global.source.url}}", &config.source_url);

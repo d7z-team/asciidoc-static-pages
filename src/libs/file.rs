@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, io};
 use std::fs::File;
 use std::io::Write;
 use std::ops::Not;
@@ -73,9 +73,9 @@ pub fn auto_copy_file(src: &str, dist: &str) {
     let dist_path = Path::new(dist);
     let parent_path = dist_path.parent().unwrap();
     if parent_path.exists().not() {
-        fs::create_dir_all(parent_path).expect(&format!("directory {} create fail!", parent_path.to_str().unwrap()));
+        fs::create_dir_all(parent_path).expect(&format!("file copy {} to {} fail : create dir fail.",src,dist));
     }
-    fs::copy(src, dist_path).unwrap();
+     fs::copy(src, dist_path).expect(&format!("file copy {} to {} fail : copy fail.",src,dist));
 }
 
 pub fn auto_write_file(path: &str, data: &str) {
