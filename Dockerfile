@@ -9,4 +9,4 @@ RUN RUST_BACKTRACE=1 cargo build --release --target x86_64-unknown-linux-musl &&
 
 FROM  asciidoctor/docker-asciidoctor:1.27
 COPY --from=builder  /usr/local/bin/asciidoc-static-pages /usr/local/bin/asciidoc-static-pages
-RUN apk add git && gem install rouge asciidoctor-kroki && ln -sf /usr/local/bin/asciidoc-static-pages /usr/local/bin/pages && git config --global --add safe.directory /documents
+RUN apk add git && gem install rouge asciidoctor-kroki && ln -sf /usr/local/bin/asciidoc-static-pages /usr/local/bin/pages && git config --global --add safe.directory '*'
