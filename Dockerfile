@@ -1,12 +1,12 @@
 # syntax=docker/dockerfile:1.3-labs
-FROM rust:1.62.0-slim-bullseye as builder
+FROM archlinux as builder
+RUN pacman -Syu rustup base-devel git musl curl wget --noconfirm && rustup target add x86_64-unknown-linux-musl
 WORKDIR /usr/src/asciidoc-static-pages
 COPY . .
-RUN apt-get update && apt-get install -y libssl-dev git curl pkg-config wget musl-tools musl && \
-    rm -rf /var/lib/apt/lists/* &&  rustup target add x86_64-unknown-linux-musl
-RUN cargo build --release --target x86_64-unknown-linux-musl && install -m 0755 target/x86_64-unknown-linux-musl/release/asciidoc-static-pages /usr/local/bin/asciidoc-static-pages
+RUN RUST_BACKTRACE=1 cargo build --release --target x86_64-unknown-linux-musl && \
+    install -m 0755 target/x86_64-unknown-linux-musl/release/asciidoc-static-pages /usr/local/bin/asciidoc-static-pages
 
 
 FROM  asciidoctor/docker-asciidoctor:1.27
-RUN apk add git && gem install rouge asciidoctor-kroki
-COPY --from=builder  /usr/local/bin/asciidoc-static-pages /usr/local/bin/pages
+COPY --from=builder  /usr/local/bin/asciidoc-static-pages /usr/local/bin/asciidoc-static-pages
+RUN apk add git && gem install rouge asciidoctor-kroki && ln -sf /usr/local/bin/asciidoc-static-pages /usr/local/bin/pages
