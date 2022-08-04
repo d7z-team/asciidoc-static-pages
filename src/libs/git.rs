@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use git2::Repository;
+use git2::{Error, Oid, Repository};
 use crate::file;
 
 #[derive(Debug)]
@@ -17,7 +17,10 @@ pub fn get_all_file_commit_info(git_root_path: &str) -> HashMap<String, GitFileI
     rev_walk.set_sorting(git2::Sort::TIME).unwrap();
     rev_walk.push_head().unwrap();
     for commit_id in rev_walk {
-        let commit_id = commit_id.unwrap();
+        let commit_id = match commit_id {
+            Ok(it) => it,
+            Err(_) => continue,
+        };
         let commit = repository.find_commit(commit_id).unwrap();
         if commit.parent_count() == 1 {
             let prev_commit = commit.parent(0).unwrap();

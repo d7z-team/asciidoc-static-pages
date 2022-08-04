@@ -146,10 +146,11 @@ fn main() {
                               &file::replace_file_ext(&config.location.main, "html"));
         string::replace_range(&mut dist_html_path_data, "{{global.commit.id}}", "none");
         string::replace_range(&mut dist_html_path_data, "{{global.icon.path}}", icon_name_str);
-        let main_git_info = git_file_info.get(&file::new_path(&config.project_path, &config.location.main)).unwrap();
-        string::replace_range(&mut dist_html_path_data, "{{global.commit.short-id}}",
-                              &main_git_info.last_update_commit_short_id);
-        string::replace_range(&mut dist_html_path_data, "{{global.commit.last-date}}", &main_git_info.last_update_commit_id);
+        if let Some(main_git_info) = git_file_info.get(&file::new_path(&config.project_path, &config.location.main)) {
+            string::replace_range(&mut dist_html_path_data, "{{global.commit.short-id}}",
+                                  &main_git_info.last_update_commit_short_id);
+            string::replace_range(&mut dist_html_path_data, "{{global.commit.last-date}}", &main_git_info.last_update_commit_id);
+        }
         string::replace_range(&mut dist_html_path_data, "</body>", &end_data);
         file::auto_write_file(&dist_html_path, &dist_html_path_data);
     }
