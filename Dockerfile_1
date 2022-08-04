@@ -1,3 +1,0 @@
-FROM  asciidoctor/docker-asciidoctor:1.27
-COPY  target/x86_64-unknown-linux-musl/release/asciidoc-static-pages /usr/local/bin/asciidoc-static-pages
-RUN apk add git && gem install rouge asciidoctor-kroki && ln -sf /usr/local/bin/asciidoc-static-pages /usr/local/bin/pages && git config --global --add safe.directory '*'
