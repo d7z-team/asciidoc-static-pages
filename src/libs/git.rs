@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use git2::{Error, Oid, Repository};
+use git2::{Repository};
 use crate::file;
 
 #[derive(Debug)]

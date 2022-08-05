@@ -23,4 +23,5 @@ pages:
       - asciidoc
   attr: # 文档变量，注意，此内容同时会加载至 asciidoctor 的 attr 配置中
     - key=value
-  attr_ref: /docs/attr.properties # 变量外部文件链接,仅支持单行 key=value 的形式！
+  attr_files:
+    - value.properties # 变量外部文件链接,仅支持单行 key=value 的形式！

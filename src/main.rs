@@ -103,7 +103,7 @@ fn main() {
         .arg("--out-file")
         .arg(&menu_plain_html_path)
         .arg(&menu_path).output().unwrap();
-    let menu_plain_data = fs::read_to_string(&menu_plain_html_path).unwrap();
+    let menu_plain_data = fs::read_to_string(&menu_plain_html_path).expect(&format!("warn! menu file  {} not exists.", &menu_path));
     let mut menu_data = res::res::MENU_TEMPLATE.to_string();
     string::replace_range(&mut menu_data, "{{body}}", &menu_plain_data);
     string::replace_range(&mut menu_data, r#".adoc">"#, r#".html">"#);
@@ -115,11 +115,14 @@ fn main() {
     file::list_pub_files(&config.output_path, &mut html_file, &Vec::new());
     let html_file: Vec<String> = html_file.iter().filter(|it| it.ends_with(".html"))
         .map(|it| it.to_string()).collect();
-    let old_icon_path = &file::new_path(&config.project_path, &config.location.icon);
-    let icon_name_str = Path::new(&old_icon_path).file_name().unwrap().to_str().unwrap();
-    file::auto_copy_file(
-        old_icon_path,
-        &file::new_path(&config.output_path, icon_name_str));
+    let old_icon_path_str = &file::new_path(&config.project_path, &config.location.icon);
+    let old_icon_path = Path::new(&old_icon_path_str);
+    let icon_name_str = Path::new(&old_icon_path_str).file_name().unwrap().to_str().unwrap();
+    if old_icon_path.is_file() {
+        file::auto_copy_file(
+            old_icon_path_str,
+            &file::new_path(&config.output_path, icon_name_str));
+    }
 // 注入默认的 css
     let mut end_data = r#"<style>{{style}}</style> <script>{{script}}</script>"#.to_string();
     let user_style_path_str = file::new_path(&config.project_path, &config.location.style);

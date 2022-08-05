@@ -13,11 +13,11 @@ pub struct PageConfig {
     #[serde(default = "default_attr")]
     pub attr: Vec<String>,
     #[serde(default = "default_ref")]
-    pub attr_ref: String,
+    pub attr_files: Vec<String>,
 }
 
-fn default_ref() -> String {
-    "".to_string()
+fn default_ref() -> Vec<String> {
+    vec![]
 }
 
 fn default_attr() -> Vec<String> {

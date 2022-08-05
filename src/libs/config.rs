@@ -42,15 +42,21 @@ impl Config {
             }
         }
         // load extra attrs
-        let attr_file_path: String = file::new_path(&project_path, &config_root.pages.attr_ref);
-        if Path::new(&attr_file_path).is_file() {
-            fs::read_to_string(attr_file_path).unwrap().lines()
-                .map(|e| -> Vec<&str> { e.splitn(2, "=").collect() })
-                .filter(|e| e.len() == 2 && e.get(0).unwrap().trim().starts_with("#").not())
-                .for_each(|e| {
-                    attrs.insert(e[0].to_string(), e[1].to_string());
-                });
+        for path in &config_root.pages.attr_files {
+            let attr_file_path: String = file::new_path(&project_path, path.as_str());
+            let attr_file_path = Path::new(&attr_file_path);
+            if attr_file_path.is_file() {
+                fs::read_to_string(attr_file_path).unwrap().lines()
+                    .map(|e| -> Vec<&str> { e.splitn(2, "=").collect() })
+                    .filter(|e| e.len() == 2 && e.get(0).unwrap().trim().starts_with("#").not())
+                    .for_each(|e| {
+                        attrs.insert(e[0].to_string(), e[1].to_string());
+                    });
+            }else {
+                eprintln!("warn: attr file {:?} not exists.",&attr_file_path)
+            }
         }
+
 
         let document_root = file::new_path(&project_path, &config_root.pages.location.root);
         let output_path = file::new_path(&project_path, &args.build_dir);
