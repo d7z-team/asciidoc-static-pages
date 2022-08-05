@@ -39,7 +39,7 @@ pages:
     - value.properties # 变量外部文件链接,仅支持单行 key=value 的形式！
 ----
 
-=== 创建 Github Action
+=== 使用 Github Action
 
 编辑文件 `.github/workflows/gh-pages.yml`，填入以下内容
 
@@ -80,6 +80,30 @@ jobs:
 ----
 
 最后提交即可。
+
+=== 使用 Gitlab
+
+编辑文件 `.gitlab-ci.yml`,填入如下内容:
+
+[source%linenums,yaml]
+----
+pages:
+  image:
+    name: ghcr.io/d7z-team/asciidoc-static-pages:v2
+  script:
+    - git checkout -b pages
+    - pages --output public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+----
+
+最后提交文件即可. 如果遇到无法获取 `git commit id` 的问题,请在 *流水线通用设置* 中修改为如下配置:
+
+image::docs/gitlab-ci-pipline.png[]
 
 == 示例网站
 
