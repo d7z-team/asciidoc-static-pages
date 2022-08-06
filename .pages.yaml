@@ -5,7 +5,7 @@ pages:
   location: # 配置路径
     root: '/docs' # 文档根目录（相对于此文件所在的目录）
     menu: '/MENU.adoc' # 菜单文档（相对于文档根目录）
-    main: '/MAIN.adoc' # 主页文档（相对于文档根目录）
+    main: '/README.adoc' # 主页文档（相对于文档根目录）
     icon: '/assets/icon/logo.svg' # 图标（相对于文档根目录）
     style: '/dark.css' # 自定义 CSS（相对于文档根目录）
     script: '/user.js' # 自定义 JS（相对于文档根目录）

@@ -50,10 +50,19 @@ impl Config {
                     .map(|e| -> Vec<&str> { e.splitn(2, "=").collect() })
                     .filter(|e| e.len() == 2 && e.get(0).unwrap().trim().starts_with("#").not())
                     .for_each(|e| {
-                        attrs.insert(e[0].to_string(), e[1].to_string());
+                        let key = e[0].to_string();
+                        let value = e[1].trim().to_string();
+                        attrs.insert(key,
+                                     if value.starts_with("\"") && value.ends_with("\"") {
+                                         value[1..value.len() - 1].replace("\\\"", "\"")
+                                     } else if value.starts_with("'") && value.ends_with("'") {
+                                         value[1..value.len() - 1].replace("\\'", "'")
+                                     } else {
+                                         value
+                                     });
                     });
-            }else {
-                eprintln!("warn: attr file {:?} not exists.",&attr_file_path)
+            } else {
+                eprintln!("warn: attr file {:?} not exists.", &attr_file_path)
             }
         }
 
