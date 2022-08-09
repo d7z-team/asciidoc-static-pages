@@ -1,5 +1,6 @@
 mod libs;
 mod res;
+mod adoc;
 
 
 use std::fs;

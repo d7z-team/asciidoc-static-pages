@@ -1,0 +1,7 @@
+.btn{
+    cursor: pointer;
+}
+.warn{
+    background: #ff0000;
+    color: white;
+}

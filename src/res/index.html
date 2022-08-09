@@ -19,7 +19,7 @@
             width: 100%;
         }
 
-        .container {
+        .pages-container {
             position: fixed;
             top: 0;
             left: 0;
@@ -42,11 +42,8 @@
                 display: none !important;
             }
 
-            .github-fork-ribbon {
-                display: none !important;
-            }
 
-            .right-menu {
+            .right-title {
                 display: block !important;
             }
         }
@@ -69,10 +66,21 @@
             margin: 0;
         }
 
-        .right-menu {
+        .pages-container .mobile-header {
+            display: flex;
+            align-items: center;
+            justify-content:space-between;
+            border-bottom: 1px black solid;
+        }
+
+        .pages-container .right-title {
             display: none;
             text-align: center;
-            border-bottom: 1px black solid;
+            align-items: center;
+        }
+
+        .pages-container .mobile-menu {
+            align-items: flex-start;
         }
 
         a {
@@ -82,7 +90,7 @@
     </style>
 </head>
 <body>
-<div class="container">
+<div class="pages-container">
     <div class="left">
         <div class="left-top">
             <a href="./{{global.main.path}}" target="_right_panel" title="首页">
@@ -92,24 +100,24 @@
             </a>
         </div>
 
-
         <iframe class="iframe" src="./menu.html"></iframe>
-
     </div>
     <div class="right">
-        <a href="./{{global.main.path}}" target="_right_panel" title="首页">
-            <h1 class="right-menu">
-                {{global.title}} 主页
-            </h1>
-        </a>
+        <div class="mobile-header">
+            <div class="btn">MENU</div>
+            <div class="menu-title">
+                <a href="./{{global.main.path}}" target="_right_panel" title="首页">
+                    <h1>
+                        {{global.title}}
+                    </h1>
+                </a>
+            </div>
+            <div class="btn">SOURCE</div>
+        </div>
+
         <iframe class="iframe" name="_right_panel" src="./{{global.main.path}}"></iframe>
     </div>
 </div>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.3/gh-fork-ribbon.min.css"
-      rel="stylesheet"/>
-<a class="github-fork-ribbon" data-ribbon="Fork me on GitHub" href="{{global.home}}"
-   target="_blank"
-   title="Fork me on GitHub">Fork me on GitHub</a>
-
+<link rel="stylesheet" href="style.css">
 </body>
 </html>
