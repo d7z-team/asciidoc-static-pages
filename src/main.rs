@@ -64,7 +64,10 @@ fn main() {
                 execute_command.arg("--attribute").arg(command);
             }
             execute_command
+                .arg("--section-numbers")
+                .arg("--attribute").arg("data-uri") // 嵌入图片
                 .arg("--attribute").arg("nofooter")
+                .arg("--attribute").arg("prewrap!") // 关闭代码换行
                 .arg("--attribute").arg("docinfo=shared-footer")
                 .arg("--attribute").arg("toc=right")
                 .arg("--attribute").arg("docinfodir=".to_string().add(&config.output_path))
