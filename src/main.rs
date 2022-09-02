@@ -65,6 +65,7 @@ fn main() {
             }
             execute_command
                 .arg("--section-numbers")
+                .arg("--attribute").arg("source-linenums-option") // 开启代码行号
                 .arg("--attribute").arg("data-uri") // 嵌入图片
                 .arg("--attribute").arg("nofooter")
                 .arg("--attribute").arg("prewrap!") // 关闭代码换行
