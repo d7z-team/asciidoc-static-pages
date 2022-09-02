@@ -5,7 +5,7 @@ use std::ops::Not;
 
 use std::path::Path;
 use std::time::{SystemTime};
-use chrono::{DateTime, Local};
+use chrono::{DateTime, Utc};
 
 pub fn new_path(parent: &str, name: &str) -> String {
     let data = if name.starts_with("/") || name.starts_with("\\") {
@@ -95,8 +95,8 @@ pub struct FileInfo {
     pub name: String,
     pub path: String,
     pub ext: String,
-    pub create_time: DateTime<Local>,
-    pub update_time: DateTime<Local>,
+    pub create_time: DateTime<Utc>,
+    pub update_time: DateTime<Utc>,
     pub commit_id: String,
     pub commit_short_id: String,
 }

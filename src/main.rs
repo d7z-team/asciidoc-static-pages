@@ -6,7 +6,7 @@ use std::fs;
 use std::ops::Add;
 use std::path::{Path};
 use std::process::Command;
-use chrono::{Local, TimeZone};
+use chrono::{Duration, TimeZone, Utc};
 use crate::file::FileInfo;
 use crate::libs::config::Config;
 use crate::libs::{file, git, string};
@@ -28,8 +28,8 @@ fn main() {
         .map(|e| {
             let mut info = FileInfo::get_info(e);
             if let Some(git_info) = git_file_info.get(&info.path) {
-                info.update_time = Local.timestamp_millis(git_info.last_update_time);
-                info.create_time = Local.timestamp_millis(git_info.last_update_time);
+                info.update_time = Utc.timestamp_millis(git_info.last_update_time);
+                info.create_time = Utc.timestamp_millis(git_info.last_update_time);
                 info.commit_id = git_info.last_update_commit_id.to_owned();
                 info.commit_short_id = git_info.last_update_commit_short_id.to_owned();
             }
@@ -66,11 +66,15 @@ fn main() {
             execute_command
                 .arg("--section-numbers")
                 .arg("--attribute").arg("source-linenums-option") // 开启代码行号
+                .arg("--attribute").arg("experimental")
+                .arg("--attribute").arg("toc-title=目录")
+                .arg("--attribute").arg("toclevels=4")
+                .arg("--attribute").arg("source-highlighter=rouge")
+                .arg("--attribute").arg("toc=right")
                 .arg("--attribute").arg("data-uri") // 嵌入图片
                 .arg("--attribute").arg("nofooter")
                 .arg("--attribute").arg("prewrap!") // 关闭代码换行
                 .arg("--attribute").arg("docinfo=shared-footer")
-                .arg("--attribute").arg("toc=right")
                 .arg("--attribute").arg("docinfodir=".to_string().add(&config.output_path))
                 .arg("--safe-mode").arg("unsafe")
                 .arg("-r").arg("asciidoctor-kroki")
@@ -89,7 +93,7 @@ fn main() {
             string::replace_range(&mut dist_html_data, "{{file.commit.id}}", &src_info.commit_id);
             string::replace_range(&mut dist_html_data, "{{file.commit.short-id}}", &src_info.commit_short_id);
             string::replace_range(&mut dist_html_data, "{{file.commit.last-date}}",
-                                  &src_info.update_time.format("%Y-%m-%d %H:%M:%S").to_string());
+                                  &src_info.update_time.add(Duration::hours(8)).format("%Y-%m-%d %H:%M:%S UTC+8").to_string());
             file::auto_write_file(&dist_html_path, &dist_html_data);
         }
     }
@@ -156,7 +160,6 @@ fn main() {
         if let Some(main_git_info) = git_file_info.get(&file::new_path(&config.project_path, &config.location.main)) {
             string::replace_range(&mut dist_html_path_data, "{{global.commit.short-id}}",
                                   &main_git_info.last_update_commit_short_id);
-            string::replace_range(&mut dist_html_path_data, "{{global.commit.last-date}}", &main_git_info.last_update_commit_id);
         }
         string::replace_range(&mut dist_html_path_data, "</body>", &end_data);
         file::auto_write_file(&dist_html_path, &dist_html_path_data);
